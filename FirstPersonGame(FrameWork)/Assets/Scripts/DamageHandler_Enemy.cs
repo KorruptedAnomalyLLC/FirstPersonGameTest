@@ -50,6 +50,8 @@ public class DamageHandler_Enemy : vp_DamageHandler
 
                 _animator.SetBool("Run Forward", true);
 
+                _navMeshAgent.enabled = true;
+
             }
 
             else
@@ -73,7 +75,14 @@ public class DamageHandler_Enemy : vp_DamageHandler
                 _animator.SetBool("Stab Attack", true);
 
                 _animator.SetBool("Run Forward", false);
+                // Expirement for stopping enemy during ATTACK
+                _navMeshAgent.enabled = false;
 
+            }
+
+            if (dist > 3.0f)
+            {
+                _navMeshAgent.enabled = true;
             }
 
         }
@@ -105,8 +114,15 @@ public class DamageHandler_Enemy : vp_DamageHandler
                 base.Damage(damageInfo);
 
                 _animator.Play("Take Damage", 0, 0.25f);
+
+                _navMeshAgent.enabled = false;
             }
         }
+    }
+
+        public void OnHitEnd()
+    {
+        _navMeshAgent.enabled = true;
     }
 
     /// <summary>
@@ -154,11 +170,19 @@ public class DamageHandler_Enemy : vp_DamageHandler
     {
         float dist = Vector3.Distance(Player.transform.position, this.transform.position);
 
+
+
         // TODO: Get rid of this magic number here: (perhaps add property)
         if (dist < 3.0f)
 
         {
             Player.SendMessage("Damage", 1.0f, SendMessageOptions.DontRequireReceiver);
+            
+        }
+
+        else
+        {
+            _navMeshAgent.enabled = true;
         }
     }
 }
